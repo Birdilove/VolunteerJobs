@@ -10,19 +10,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.csis4280.volunteerjobs.MainActivity
-import com.csis4280.volunteerjobs.databinding.ActivityAuthenticationBinding
 import com.csis4280.volunteerjobs.databinding.FragmentLoginBinding
-import com.google.firebase.FirebaseOptions
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.fragment_login.view.*
 
 class LoginFragment : Fragment() {
 
-    private lateinit var viewModel: LoginViewModel
+    private lateinit var viewModel: AuthenticationViewModel
     private lateinit var binding: FragmentLoginBinding
     private lateinit var auth: FirebaseAuth
 
@@ -30,50 +27,14 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
         binding = FragmentLoginBinding.inflate(inflater,container,false)
-        viewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(AuthenticationViewModel::class.java)
 
         binding.buttonLogin.setOnClickListener{
-            if(binding.editTextTextEmailAddress.text.toString().trim() != "" && binding.editTextTextPassword.text.toString().trim() != "") {
-                HapticFeedbackConstants.VIRTUAL_KEY
-                auth.signInWithEmailAndPassword(
-                    binding.editTextTextEmailAddress.text.toString(),
-                    binding.editTextTextPassword.text.toString()
-                )
-                    .addOnCompleteListener(requireActivity()) { task ->
-                        if (task.isSuccessful) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success")
-                            val user = auth.currentUser
-                            Toast.makeText(
-                                context, "Authentication Success.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            val intent = Intent(requireContext(), MainActivity::class.java)
-                            startActivity(intent)
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.exception)
-                            Toast.makeText(
-                                context, "Authentication failed.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                        }
-
-                        // [START_EXCLUDE]
-                        if (!task.isSuccessful) {
-
-                        }
-
-                        // [END_EXCLUDE]
-                    }
-            }
-            else{
-                Toast.makeText(context, "Please enter valid username and password.", Toast.LENGTH_SHORT).show()
-            }
+            login()
         }
 
         binding.textViewSignUp.setOnClickListener{
@@ -88,6 +49,54 @@ class LoginFragment : Fragment() {
             findNavController().navigate(action)
         }
        return binding.root
+    }
+
+    private fun login(){
+        if(binding.editTextTextEmailAddress.text.toString().trim() != "" && binding.editTextTextPassword.text.toString().trim() != "") {
+            HapticFeedbackConstants.VIRTUAL_KEY
+            auth.signInWithEmailAndPassword(
+                binding.editTextTextEmailAddress.text.toString(),
+                binding.editTextTextPassword.text.toString()
+            )
+                .addOnCompleteListener(requireActivity()) { task ->
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithEmail:success")
+                        val user = auth.currentUser
+                        Toast.makeText(
+                            context, "Authentication Success.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        val intent = Intent(requireContext(), MainActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithEmail:failure", task.exception)
+                        Toast.makeText(
+                            context, "Authentication failed.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    // [START_EXCLUDE]
+                    if (!task.isSuccessful) {
+                        Toast.makeText(context, "Please enter valid username and password.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        }
+        else{
+            Toast.makeText(context, "Please enter valid username and password.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // [START on_start_check_user]
+    public override fun onStart() {
+        super.onStart()
+        // Check if user is signed in (non-null) and update UI accordingly.
+        val currentUser = auth.currentUser
+        if(currentUser != null){
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 
 }

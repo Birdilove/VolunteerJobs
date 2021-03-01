@@ -13,13 +13,13 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.csis4280.volunteerjobs.ui.dashboard.DashboardFragment"
+        android:name="com.csis4280.volunteerjobs.ui.postJob.PostJobFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_post_job" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.csis4280.volunteerjobs.ui.notifications.NotificationsFragment"
+        android:name="com.csis4280.volunteerjobs.ui.participations.ParticipationsFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_participations" />
 </navigation>
