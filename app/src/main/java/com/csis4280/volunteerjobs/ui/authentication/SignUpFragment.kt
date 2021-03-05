@@ -35,7 +35,8 @@ class SignUpFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(AuthenticationViewModel::class.java)
 
         binding.buttonSignUp.setOnClickListener{
-            createAccount(binding.editTextSignUpEmail.text.toString().trim(), binding.editTextSignUpPassword.text.toString().trim() )
+            viewModel.addSampleData()
+            //createAccount(binding.editTextSignUpEmail.text.toString().trim(), binding.editTextSignUpPassword.text.toString().trim() )
         }
 
         binding.textViewAlreadyUser.setOnClickListener{
