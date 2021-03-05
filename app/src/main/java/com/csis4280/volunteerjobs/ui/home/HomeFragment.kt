@@ -8,7 +8,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.room.Room
 import com.csis4280.volunteerjobs.R
+import com.csis4280.volunteerjobs.ui.database.AppDatabase
+import com.csis4280.volunteerjobs.ui.database.user
 
 class HomeFragment : Fragment() {
 
@@ -19,10 +22,11 @@ class HomeFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        homeViewModel =
-                ViewModelProvider(this).get(HomeViewModel::class.java)
+        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         val textView: TextView = root.findViewById(R.id.text_home)
+
+
         homeViewModel.text.observe(viewLifecycleOwner, Observer {
             textView.text = it
         })
