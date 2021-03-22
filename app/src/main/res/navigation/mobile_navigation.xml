@@ -9,17 +9,46 @@
         android:id="@+id/navigation_home"
         android:name="com.csis4280.volunteerjobs.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_post"
+            app:destination="@id/navigation_post" />
+        <action
+            android:id="@+id/action_navigation_home_to_jobDetailsFragment"
+            app:destination="@id/jobDetailsFragment" />
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_post"
         android:name="com.csis4280.volunteerjobs.ui.postJob.PostJobFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_post_job" />
+        android:label="@string/title_post"
+        tools:layout="@layout/fragment_post_job" >
+        <argument
+            android:name="jobid"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_participations"
         android:name="com.csis4280.volunteerjobs.ui.participations.ParticipationsFragment"
-        android:label="@string/title_notifications"
+        android:label="@string/title_participation"
         tools:layout="@layout/fragment_participations" />
+    <fragment
+        android:id="@+id/jobDetailsFragment"
+        android:name="com.csis4280.volunteerjobs.ui.jobDetails.JobDetailsFragment"
+        android:label="fragment_job_details"
+        tools:layout="@layout/fragment_job_details">
+        <argument
+            android:name="jobId"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_jobDetailsFragment_to_navigation_home2"
+            app:destination="@id/navigation_home" />
+        <argument
+            android:name="isSignedUp"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
 </navigation>

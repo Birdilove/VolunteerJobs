@@ -30,13 +30,13 @@ class SignUpFragment : Fragment() {
     ): View? {
 
         auth = FirebaseAuth.getInstance()
-        val currentUser = auth.currentUser
         binding = FragmentSignUpBinding.inflate(inflater,container,false)
         viewModel = ViewModelProvider(this).get(AuthenticationViewModel::class.java)
 
         binding.buttonSignUp.setOnClickListener{
+            viewModel.setUser()
             viewModel.addSampleData()
-            //createAccount(binding.editTextSignUpEmail.text.toString().trim(), binding.editTextSignUpPassword.text.toString().trim() )
+            createAccount(binding.editTextSignUpEmail.text.toString().trim(), binding.editTextSignUpPassword.text.toString().trim() )
         }
 
         binding.textViewAlreadyUser.setOnClickListener{
@@ -55,16 +55,15 @@ class SignUpFragment : Fragment() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success")
-                    val user = auth.currentUser
+                    viewModel.getUserById(auth.currentUser?.email.toString())
+                    viewModel.addUser(auth.currentUser?.email.toString(),auth.currentUser?.email.toString())
                     val intent = Intent(requireContext(), MainActivity::class.java)
                     startActivity(intent)
-
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     Toast.makeText(context, "Authentication failed.",
                         Toast.LENGTH_SHORT).show()
-
                 }
             }
     }

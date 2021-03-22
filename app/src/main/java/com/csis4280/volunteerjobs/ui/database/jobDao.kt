@@ -1,10 +1,7 @@
 package com.csis4280.volunteerjobs.ui.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface jobDao {
@@ -17,5 +14,12 @@ interface jobDao {
 
     @Query("SELECT * FROM job ")
     fun getAll(): LiveData<List<job>>
+
+    @Query("SELECT * FROM job WHERE jobId = :id")
+    fun getJobById(id: Int): job?
+
+    @Delete
+    fun deleteJob(note: job)
+
 
 }

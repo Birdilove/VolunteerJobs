@@ -8,12 +8,14 @@ import androidx.room.Query
 
 @Dao
 interface userDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertNote(user:user)
 
-
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    fun insertUser(user:user)
 
     @Query("SELECT * FROM user ")
-    fun getAll():LiveData<List<user>>
+    fun getAll():LiveData<user>
+
+    @Query("SELECT * FROM user WHERE userEmail = :email")
+    fun getUserById(email: String): user?
 
 }

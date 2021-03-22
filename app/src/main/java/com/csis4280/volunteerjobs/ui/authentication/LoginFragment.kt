@@ -35,7 +35,6 @@ class LoginFragment : Fragment() {
         binding = FragmentLoginBinding.inflate(inflater,container,false)
         viewModel = ViewModelProvider(this).get(AuthenticationViewModel::class.java)
 
-
         binding.buttonLogin.setOnClickListener{
             login()
         }
@@ -101,5 +100,7 @@ class LoginFragment : Fragment() {
             startActivity(intent)
         }
     }
+
+
 
 }
