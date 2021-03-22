@@ -13,8 +13,10 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import androidx.room.Room
 import com.csis4280.volunteerjobs.MainActivity
 import com.csis4280.volunteerjobs.databinding.FragmentLoginBinding
+import com.csis4280.volunteerjobs.ui.database.AppDatabase
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginFragment : Fragment() {
@@ -98,5 +100,7 @@ class LoginFragment : Fragment() {
             startActivity(intent)
         }
     }
+
+
 
 }
