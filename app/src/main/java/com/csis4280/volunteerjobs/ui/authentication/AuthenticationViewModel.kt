@@ -15,16 +15,6 @@ import java.util.*
 class AuthenticationViewModel(app: Application) : AndroidViewModel(app) {
     private val database = AppDatabase.getInstance(app)
     var currentUser = MutableLiveData<user>()
-    fun addSampleData() {
-        viewModelScope.launch {
-
-            withContext(Dispatchers.IO) {
-               /* database?.userDao()?.insertUser(user("tobit", "toshum"))
-                database?.jobDao()?.insertJob(job("cleaning", "Cleaning an old age home", "Cleaning", Date(), Date()))
-                //database?.paeticipantDao()?.insertParticipant(participants(1,""))*/
-            }
-        }
-    }
 
     fun getUserById(userEmail: String) {
         viewModelScope.launch {
@@ -50,19 +40,14 @@ class AuthenticationViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun addUser(username: String, userEmail: String) {
-        Log.i("Here", "Add1")
         currentUser.value?.let {
             it.userName = username
             it.userEmail = userEmail
-            Log.i("Here", "Add2")
             viewModelScope.launch {
-                Log.i("Here", "Add3")
                 withContext(Dispatchers.IO) {
-                    Log.i("Here", "Add4")
                     database?.userDao()?.insertUser(it)
                 }
             }
         }
     }
-
 }

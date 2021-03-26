@@ -2,6 +2,7 @@ package com.csis4280.volunteerjobs.ui.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.google.firebase.auth.EmailAuthProvider
 
 @Dao
 interface participantDao {
@@ -15,11 +16,11 @@ interface participantDao {
     @Query("SELECT * FROM participants")
     fun getAll(): List<participants>
 
-    @Query("SELECT * FROM participants Where participants.jobId = :id")
-    fun getParticipentById(id: Int): participants?
+    @Query("SELECT * FROM participants Where participants.jobId = :id AND participants.userEmail = :email")
+    fun getParticipentById(id: Int, email: String): participants?
 
-    @Query("SELECT * FROM job JOIN participants ON participants.jobId = job.jobId")
-    fun getAllParticipations(): LiveData<List<job>>
+    @Query("SELECT * FROM job JOIN participants ON participants.jobId = job.jobId AND participants.userEmail = :email")
+    fun getAllParticipations(email: String): LiveData<List<job>>
 
     @Query("SELECT * FROM job WHERE jobId = :id")
     fun getJobById(id: Int): job?

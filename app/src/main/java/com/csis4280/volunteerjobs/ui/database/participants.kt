@@ -22,9 +22,10 @@ import kotlinx.android.parcel.Parcelize
         )],
 )
 data class participants(
-        @PrimaryKey
+        @PrimaryKey(autoGenerate = true)
+        var particiaptionId: Int,
         var jobId: Int,
         var userId: Int,
         var userEmail: String) : Parcelable {
-    constructor() : this(0, 0, "")
+    constructor() : this(0,0, 0, "")
 }

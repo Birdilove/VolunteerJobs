@@ -31,11 +31,11 @@ class LoginFragment : Fragment() {
     ): View? {
 
         auth = FirebaseAuth.getInstance()
-        val currentUser = auth.currentUser
         binding = FragmentLoginBinding.inflate(inflater,container,false)
         viewModel = ViewModelProvider(this).get(AuthenticationViewModel::class.java)
 
         binding.buttonLogin.setOnClickListener{
+            viewModel.setUser()
             login()
         }
 
@@ -64,7 +64,8 @@ class LoginFragment : Fragment() {
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success")
-                        val user = auth.currentUser
+                        viewModel.getUserById(auth.currentUser?.email.toString())
+                        viewModel.addUser(auth.currentUser?.email.toString(),auth.currentUser?.email.toString())
                         Toast.makeText(
                             context, "Authentication Success.",
                             Toast.LENGTH_SHORT

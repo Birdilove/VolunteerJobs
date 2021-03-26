@@ -35,7 +35,6 @@ class SignUpFragment : Fragment() {
 
         binding.buttonSignUp.setOnClickListener{
             viewModel.setUser()
-            viewModel.addSampleData()
             createAccount(binding.editTextSignUpEmail.text.toString().trim(), binding.editTextSignUpPassword.text.toString().trim() )
         }
 

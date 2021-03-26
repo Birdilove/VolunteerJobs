@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
-
 @Parcelize
 @Entity(tableName = "job")
 data class job(
@@ -16,9 +15,10 @@ data class job(
     var jobDescription: String,
     var jobType:String,
     var startDate: Date,
-    var endDate: Date
+    var endDate: Date,
+    var postedBy: String
 ): Parcelable {
-    constructor() : this(0, "", "","", Date(), Date())
-    constructor(jobTitle: String, jobDescription: String, jobType: String, startDate: Date, endDate: Date) : this(0, jobTitle,jobDescription,jobType,startDate,endDate)
+    constructor() : this(0, "", "","", Date(), Date(),"")
+    constructor(jobTitle: String, jobDescription: String, jobType: String, startDate: Date, endDate: Date, postedBy: String) : this(0, jobTitle,jobDescription,jobType,startDate,endDate, postedBy)
 }
 
