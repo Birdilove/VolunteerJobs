@@ -11,8 +11,8 @@ import kotlinx.android.parcel.Parcelize
         tableName = "participants",
         foreignKeys = [ForeignKey(
                 entity = job::class,
-                parentColumns = arrayOf("jobId"),
-                childColumns = arrayOf("jobId"),
+                parentColumns = arrayOf("jobId", "postedBy"),
+                childColumns = arrayOf("jobId", "userEmail"),
                 onDelete = ForeignKey.CASCADE
         ), ForeignKey(
                 entity = user::class,

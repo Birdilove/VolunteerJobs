@@ -3,6 +3,7 @@ package com.csis4280.volunteerjobs.ui.postJob
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,9 +17,19 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.csis4280.volunteerjobs.R
+import com.csis4280.volunteerjobs.URL
 import com.csis4280.volunteerjobs.databinding.FragmentPostJobBinding
 import com.csis4280.volunteerjobs.databinding.FragmentResetPasswordBinding
+import com.csis4280.volunteerjobs.ui.database.job
 import com.google.firebase.auth.FirebaseAuth
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.socket.client.IO
+import io.socket.client.Socket
+import io.socket.emitter.Emitter
+import java.net.URISyntaxException
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -32,11 +43,15 @@ class PostJobFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var startDate: Date
     private lateinit var endDate: Date
+    private val myType = Types.newParameterizedType(List::class.java, job::class.java)
+    var string: String = ""
+    var mSocket: Socket? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         auth = FirebaseAuth.getInstance()
         binding = FragmentPostJobBinding.inflate(inflater, container, false)
         postJobViewModel = ViewModelProvider(this).get(PostJobViewModel::class.java)
@@ -46,8 +61,8 @@ class PostJobFragment : Fragment() {
             postJobViewModel.currentJob.value?.jobType = binding.editTextType.text.toString()
             postJobViewModel.currentJob.value?.jobDescription =
                 binding.editTextJobDesc.text.toString()
-            postJobViewModel.currentJob.value?.startDate = startDate
-            postJobViewModel.currentJob.value?.endDate = endDate
+            postJobViewModel.currentJob.value?.startDate = startDate.toString()
+            postJobViewModel.currentJob.value?.endDate = endDate.toString()
             postJobViewModel.currentJob.value?.postedBy = auth.currentUser?.email.toString()
             postJobViewModel.updateJob()
         }
@@ -63,7 +78,10 @@ class PostJobFragment : Fragment() {
         binding.button4.setOnClickListener{
             FirebaseAuth.getInstance().signOut();
         }
+
         postJobViewModel.getJobById(args.jobid)
+        postJobViewModel.getMaxId(auth.currentUser?.email.toString())
+
         return binding.root
     }
 
@@ -77,6 +95,9 @@ class PostJobFragment : Fragment() {
             pickedDateTime.set(year, month, day)
             val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy")
             button.text = simpleDateFormat.format(pickedDateTime.time)
+            Log.i("DATE",
+                simpleDateFormat.parse(simpleDateFormat.format(pickedDateTime.time)).toString()
+            )
             if(flag == 0){
             startDate = pickedDateTime.time
             }else{

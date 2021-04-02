@@ -18,8 +18,9 @@ interface jobDao {
     @Query("SELECT * FROM job WHERE jobId = :id")
     fun getJobById(id: Int): job?
 
+    @Query("SELECT MAX(jobId) FROM job WHERE postedBy = :email")
+    fun getMAXJobId(email: String): Int?
+
     @Delete
     fun deleteJob(note: job)
-
-
 }

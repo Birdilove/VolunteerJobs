@@ -101,7 +101,4 @@ class LoginFragment : Fragment() {
             startActivity(intent)
         }
     }
-
-
-
 }

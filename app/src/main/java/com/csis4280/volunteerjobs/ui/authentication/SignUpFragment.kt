@@ -17,6 +17,9 @@ import com.csis4280.volunteerjobs.R
 import com.csis4280.volunteerjobs.databinding.FragmentLoginBinding
 import com.csis4280.volunteerjobs.databinding.FragmentSignUpBinding
 import com.google.firebase.auth.FirebaseAuth
+import io.socket.client.IO
+import org.json.JSONObject
+import java.net.URISyntaxException
 
 class SignUpFragment : Fragment() {
 
@@ -32,7 +35,7 @@ class SignUpFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         binding = FragmentSignUpBinding.inflate(inflater,container,false)
         viewModel = ViewModelProvider(this).get(AuthenticationViewModel::class.java)
-
+        viewModel.connectToServer()
         binding.buttonSignUp.setOnClickListener{
             viewModel.setUser()
             createAccount(binding.editTextSignUpEmail.text.toString().trim(), binding.editTextSignUpPassword.text.toString().trim() )
@@ -43,7 +46,6 @@ class SignUpFragment : Fragment() {
             val action = SignUpFragmentDirections.actionSignUpFragmentToLoginFragment()
             findNavController().navigate(action)
         }
-
         return binding.root
     }
 

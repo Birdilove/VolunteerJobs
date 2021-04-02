@@ -24,7 +24,6 @@ class ListAdapterParticipated(
 
     interface ListItemListener {
         fun editJob(noteId: Int, isSignedUp: Int)
-        fun onItemSelectionChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

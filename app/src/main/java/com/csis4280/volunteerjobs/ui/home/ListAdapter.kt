@@ -16,7 +16,6 @@ class ListAdapter(
     private val listener: ListItemListener
 ) : RecyclerView.Adapter<ListAdapter.ViewHolder>() {
 
-
     inner class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
         val binding = ListLayoutBinding.bind(itemView)
@@ -24,7 +23,6 @@ class ListAdapter(
 
     interface ListItemListener {
         fun editJob(noteId: Int, isSignedUp: Int)
-        fun onItemSelectionChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

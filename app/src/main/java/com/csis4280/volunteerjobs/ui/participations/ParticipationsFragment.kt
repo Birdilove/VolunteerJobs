@@ -43,8 +43,4 @@ class ParticipationsFragment : Fragment(), ListAdapter.ListItemListener {
     override fun editJob(noteId: Int, isSignedUp: Int) {
 
     }
-
-    override fun onItemSelectionChanged() {
-
-    }
 }
