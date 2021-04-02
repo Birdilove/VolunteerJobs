@@ -28,7 +28,7 @@ import java.io.InputStream
 import java.net.URISyntaxException
 
 var string: String = ""
-const val URL = "http://54.161.40.50:5000/"
+const val URL = "http://52.70.73.212:5000/"
 class MainActivity : AppCompatActivity() {
     var mSocket: Socket? = null
     private lateinit var auth: FirebaseAuth
