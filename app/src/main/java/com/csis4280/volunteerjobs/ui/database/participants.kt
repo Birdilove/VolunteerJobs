@@ -19,10 +19,9 @@ import kotlinx.android.parcel.Parcelize
                 parentColumns = arrayOf("userId"),
                 childColumns = arrayOf("userId"),
                 onDelete = ForeignKey.CASCADE
-        )],
+        )],primaryKeys = ["jobId", "userEmail"]
 )
 data class participants(
-        @PrimaryKey(autoGenerate = true)
         var particiaptionId: Int,
         var jobId: Int,
         var userId: Int,
