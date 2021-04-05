@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
-import androidx.annotation.Nullable
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +18,11 @@ import com.csis4280.volunteerjobs.databinding.FragmentJobDetailsBinding
 import com.csis4280.volunteerjobs.loggedInUser
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalDateTime.ofInstant
+import java.time.OffsetDateTime.ofInstant
+import java.time.ZoneId
 import java.util.*
 
 class JobDetailsFragment : Fragment() {
@@ -102,17 +106,30 @@ class JobDetailsFragment : Fragment() {
         }
 
         binding.buttonUpdateJob.setOnClickListener {
-            viewModel.currentJob.observe(viewLifecycleOwner, {
-                it.jobTitle = binding.title.text.toString()
-                it.jobType = binding.type.text.toString()
-                it.jobDescription = binding.description.text.toString()
-                it.startDate = startDate.toString()
-                it.endDate = endDate.toString()
-            })
-            viewModel.updateJob()
+            if((binding.title.text.toString().trim().length>0) && (binding.type.text.toString().trim().length>0) && (binding.description.text.toString().trim().length>0) &&( startDate <= endDate) ){
+                viewModel.currentJob.observe(viewLifecycleOwner, {
+                    it.jobTitle = binding.title.text.toString()
+                    it.jobType = binding.type.text.toString()
+                    it.jobDescription = binding.description.text.toString()
+                    it.startDate = startDate.toString()
+                    it.endDate = endDate.toString()
+                })
+                viewModel.updateJob()
 
-            Toast.makeText(requireContext(), "Job post updated", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Job post updated", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                if(( startDate > endDate)){
+                    Toast.makeText(
+                        requireContext(),
+                        "please choose a valid dates",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
         }
+
 
         binding.buttonDeleteJob.setOnClickListener {
             viewModel.deleteJob()
@@ -131,6 +148,16 @@ class JobDetailsFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun checkDates(date: Date): Boolean {
+        val currentDateTime = LocalDateTime.now()
+        if(currentDateTime.compareTo(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()))>0){
+            return true
+        }
+        else
+            return false
+
+    }
     private fun add() {
         viewModel.addToParticipation(
             viewModel.currentJob.value?.jobId!!,
@@ -139,25 +166,46 @@ class JobDetailsFragment : Fragment() {
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun pickDateTime(button: Button, flag: Int): Date {
         val currentDateTime = Calendar.getInstance()
         val startYear = currentDateTime.get(Calendar.YEAR)
         val startMonth = currentDateTime.get(Calendar.MONTH)
         val startDay = currentDateTime.get(Calendar.DAY_OF_MONTH)
         val pickedDateTime = Calendar.getInstance()
-        DatePickerDialog(requireContext(), { _, year, month, day ->
+        var datePickerDialog : DatePickerDialog = DatePickerDialog(requireContext(), { _, year, month, day ->
             pickedDateTime.set(year, month, day)
             val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy")
             button.text = simpleDateFormat.format(pickedDateTime.time)
-            Log.i("DATE",
+            Log.i(
+                "DATE",
                 simpleDateFormat.parse(simpleDateFormat.format(pickedDateTime.time)).toString()
             )
-            if(flag == 0){
+            if (flag == 0) {
                 startDate = pickedDateTime.time
-            }else{
+            } else {
                 endDate = pickedDateTime.time
             }
-        }, startYear, startMonth, startDay).show()
+        }, startYear, startMonth, startDay)
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.show()
+
+
+
+       /* DatePickerDialog(requireContext(), { _, year, month, day ->
+            pickedDateTime.set(year, month, day)
+            val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy")
+            button.text = simpleDateFormat.format(pickedDateTime.time)
+            Log.i(
+                "DATE",
+                simpleDateFormat.parse(simpleDateFormat.format(pickedDateTime.time)).toString()
+            )
+            if (flag == 0) {
+                startDate = pickedDateTime.time
+            } else {
+                endDate = pickedDateTime.time
+            }
+        }, startYear, startMonth, startDay).show()*/
         return pickedDateTime.time
     }
 }

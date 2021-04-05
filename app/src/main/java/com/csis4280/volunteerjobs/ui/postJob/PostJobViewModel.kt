@@ -2,6 +2,8 @@ package com.csis4280.volunteerjobs.ui.postJob
 
 import android.app.Application
 import android.util.Log
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -63,6 +65,7 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
             it.jobDescription = it.jobDescription.trim()
             it.jobType = it.jobType.trim()
             if (it.jobId == 0 && it.jobTitle.isEmpty()) {
+
                 return
             }
 
