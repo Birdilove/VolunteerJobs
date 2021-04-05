@@ -26,7 +26,7 @@ import java.net.URISyntaxException
 
 var mSocket: Socket? = null
 var string: String = ""
-const val URL = "http://52.55.26.25:5000/"
+const val URL = "http://54.174.139.142:5000/"
 var loggedInUser = FirebaseAuth.getInstance().currentUser?.email.toString()
 
 class MainActivity : AppCompatActivity() {
@@ -74,8 +74,8 @@ class MainActivity : AppCompatActivity() {
         mSocket?.emit("getParticipants")
         mSocket?.on("notification", onNewMessage)
         mSocket?.on("deleteJob", onDeleteJob)
-        mSocket?.on("datasent", onDataUpdateJobList)
-        mSocket?.on("updateJob", onUpdateJob)
+        mSocket?.on("addNewJob", onDataUpdateJobList)
+        mSocket?.on("updateJob", onDataUpdateJobList)
         mSocket?.on("updateParticipants", onDataParticipantsUpdate)
         mSocket?.on("deleteParticipants", onDeleteParticipation)
     }
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
     private val onDataUpdateJobList = Emitter.Listener { args ->
         this.runOnUiThread {
             val data = args[0] as String
-
+            Log.i("Adding new job", "Added")
             val moshi: Moshi = Moshi.Builder()
                 .add(KotlinJsonAdapterFactory())
                 .build()
@@ -100,29 +100,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    private val onDataParticipantsUpdate = Emitter.Listener { args ->
-        this.runOnUiThread {
-            val data = args[0] as String
-            val moshi: Moshi = Moshi.Builder()
-                .add(KotlinJsonAdapterFactory())
-                .build()
-            val adapter: JsonAdapter<List<participants>> = moshi.adapter(typeParticipations)
-            val dataList = adapter.fromJson(data)
-
-            if (dataList != null) {
-                participationsViewModel.updateParticipantsList(dataList)
-            }
-        }
-    }
-
-    private val onNewMessage =
-        Emitter.Listener { args ->
-            this.runOnUiThread(Runnable {
-                val data = args[0] as String
-                Toast.makeText(this, data, Toast.LENGTH_SHORT).show()
-            })
-        }
 
     private val onDeleteJob =
         Emitter.Listener { args ->
@@ -139,27 +116,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    private val onUpdateJob =
-        Emitter.Listener { args ->
-            this.runOnUiThread {
-                val data = args[0] as String
-                val moshi: Moshi = Moshi.Builder()
-                    .add(KotlinJsonAdapterFactory())
-                    .build()
-                Log.i("Datasent", "HERE")
-                val adapter: JsonAdapter<List<job>> = moshi.adapter(typeJob)
-                val dataList = adapter.fromJson(data)
-                if (dataList != null) {
-                    postJobViewModel.updateJobList(dataList)
-                }
-            }
-        }
+    private val onDataParticipantsUpdate = Emitter.Listener { args ->
+        this.runOnUiThread {
+            val data = args[0] as String
+            val moshi: Moshi = Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .build()
+            val adapter: JsonAdapter<List<participants>> = moshi.adapter(typeParticipations)
+            val dataList = adapter.fromJson(data)
 
-    override fun onBackPressed() {
-        val fragment =
-            this.supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container)
-        (fragment as? IOnBackPressed)?.onBackPressed()?.let {
-            super.onBackPressed()
+            if (dataList != null) {
+                participationsViewModel.updateParticipantsList(dataList)
+            }
         }
     }
 
@@ -176,6 +144,22 @@ class MainActivity : AppCompatActivity() {
             if (dataList != null) {
                 participationsViewModel.deleteParticipation(dataList)
             }
+        }
+    }
+
+    private val onNewMessage =
+        Emitter.Listener { args ->
+            this.runOnUiThread(Runnable {
+                val data = args[0] as String
+                Toast.makeText(this, data, Toast.LENGTH_SHORT).show()
+            })
+        }
+
+    override fun onBackPressed() {
+        val fragment =
+            this.supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container)
+        (fragment as? IOnBackPressed)?.onBackPressed()?.let {
+            super.onBackPressed()
         }
     }
 }

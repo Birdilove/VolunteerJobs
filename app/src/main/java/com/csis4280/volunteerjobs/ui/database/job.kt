@@ -18,10 +18,11 @@ data class job(
     var jobType:String,
     @Json(name = "jobStartDate")var startDate: String,
     @Json(name = "jobEndDate")var endDate: String,
-    var postedBy: String
+    var postedBy: String,
+    var noOfSlots: Int
 ): Parcelable {
-    constructor() : this(0, "", "","", "", "","")
-    constructor(jobTitle: String, jobDescription: String, jobType: String, startDate: String, endDate: String, postedBy: String) : this(0, jobTitle,jobDescription,jobType,startDate,endDate, postedBy)
+    constructor() : this(0, "", "","", "", "","", 0)
+    constructor(jobTitle: String, jobDescription: String, jobType: String, startDate: String, endDate: String, postedBy: String) : this(0, jobTitle,jobDescription,jobType,startDate,endDate, postedBy, 0)
 }
 
 

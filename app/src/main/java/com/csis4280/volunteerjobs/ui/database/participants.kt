@@ -9,12 +9,12 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 @Entity(
         tableName = "participants",
-        foreignKeys = [ForeignKey(
+        /*foreignKeys = [ForeignKey(
                 entity = job::class,
                 parentColumns = arrayOf("jobId", "postedBy"),
                 childColumns = arrayOf("jobId", "postedBy"),
                 onDelete = ForeignKey.CASCADE
-        )],primaryKeys = ["jobId", "postedBy", "userEmail"]
+        )]*/primaryKeys = ["jobId", "postedBy", "userEmail"]
 )
 data class participants(
         var jobId: Int,
