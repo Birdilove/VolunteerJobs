@@ -73,6 +73,8 @@ class PostJobFragment : Fragment() {
                 postJobViewModel.currentJob.value?.endDate = endDate.toString()
                 postJobViewModel.currentJob.value?.postedBy = auth.currentUser?.email.toString()
                 postJobViewModel.updateJob()
+                startDatecheck =""
+                endDatecheck =""
                 val action =
                     PostJobFragmentDirections.actionNavigationPostToNavigationHome()
                 findNavController().navigate(action)
@@ -138,8 +140,10 @@ class PostJobFragment : Fragment() {
             )
             if (flag == 0) {
                 startDate = pickedDateTime.time
+                startDatecheck = pickedDateTime.time.toString()
             } else {
                 endDate = pickedDateTime.time
+                endDatecheck = pickedDateTime.time.toString()
             }
         }, startYear, startMonth, startDay)
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);

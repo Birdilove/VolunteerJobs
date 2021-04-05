@@ -26,7 +26,7 @@ import java.net.URISyntaxException
 
 var mSocket: Socket? = null
 var string: String = ""
-const val URL = "http://52.55.26.25:5000/"
+const val URL = "http://3.84.237.40:5000/"
 var loggedInUser = FirebaseAuth.getInstance().currentUser?.email.toString()
 
 class MainActivity : AppCompatActivity() {
