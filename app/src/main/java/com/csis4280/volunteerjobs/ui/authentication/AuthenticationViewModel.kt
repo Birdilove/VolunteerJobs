@@ -26,7 +26,7 @@ class AuthenticationViewModel(app: Application) : AndroidViewModel(app) {
 
     fun connectToServer(){
         try {
-            mSocket = IO.socket("http://34.235.123.166:5000/")
+            mSocket = IO.socket("http://3.84.237.40:5000/")
         } catch (e: URISyntaxException) {
             Log.d("URI error", e.message.toString())
         }
