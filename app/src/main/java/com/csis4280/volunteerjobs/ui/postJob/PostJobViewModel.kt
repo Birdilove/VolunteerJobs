@@ -27,7 +27,6 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
     fun updateJobList(jobList: List<job>) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                Log.i("ADDDATA", "HERE")
                 database?.jobDao()?.insertAllJob(jobList)
             }
         }
@@ -101,6 +100,22 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
                         mSocket?.emit("newJob", jobj)
                     }
                 }
+            }
+        }
+    }
+
+    fun deleteAll(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                database?.jobDao()?.deleteAll()
+            }
+        }
+    }
+
+    fun deleteJob(job: List<job>){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                database?.jobDao()?.deleteJobList(job)
             }
         }
     }

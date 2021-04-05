@@ -27,6 +27,9 @@
             android:name="jobid"
             app:argType="integer"
             android:defaultValue="0" />
+        <action
+            android:id="@+id/action_navigation_post_to_navigation_home"
+            app:destination="@id/navigation_home" />
     </fragment>
 
     <fragment

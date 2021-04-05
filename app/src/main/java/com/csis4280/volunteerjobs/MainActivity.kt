@@ -3,10 +3,8 @@ package com.csis4280.volunteerjobs
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -15,6 +13,7 @@ import com.csis4280.volunteerjobs.ui.database.job
 import com.csis4280.volunteerjobs.ui.database.participants
 import com.csis4280.volunteerjobs.ui.participations.ParticipationsViewModel
 import com.csis4280.volunteerjobs.ui.postJob.PostJobViewModel
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -23,21 +22,19 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.InputStream
 import java.net.URISyntaxException
 
 var mSocket: Socket? = null
 var string: String = ""
-const val URL = "http://3.85.78.25:5000/"
+const val URL = "http://52.55.26.25:5000/"
 var loggedInUser = FirebaseAuth.getInstance().currentUser?.email.toString()
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private val typeJob = Types.newParameterizedType(List::class.java, job::class.java)
-    private val typeParticipations = Types.newParameterizedType(List::class.java, participants::class.java)
+    private val typeParticipations =
+        Types.newParameterizedType(List::class.java, participants::class.java)
     private lateinit var postJobViewModel: PostJobViewModel
     private lateinit var participationsViewModel: ParticipationsViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,10 +71,13 @@ class MainActivity : AppCompatActivity() {
             Log.i("Connection ", string)
         }
         mSocket?.emit("getData")
-        mSocket?.emit("updateParticipants")
+        mSocket?.emit("getParticipants")
         mSocket?.on("notification", onNewMessage)
+        mSocket?.on("deleteJob", onDeleteJob)
         mSocket?.on("datasent", onDataUpdateJobList)
+        mSocket?.on("updateJob", onUpdateJob)
         mSocket?.on("updateParticipants", onDataParticipantsUpdate)
+        mSocket?.on("deleteParticipants", onDeleteParticipation)
     }
 
     override fun onDestroy() {
@@ -92,10 +92,9 @@ class MainActivity : AppCompatActivity() {
             val moshi: Moshi = Moshi.Builder()
                 .add(KotlinJsonAdapterFactory())
                 .build()
-            val adapter : JsonAdapter<List<job>> = moshi.adapter(typeJob)
+            val adapter: JsonAdapter<List<job>> = moshi.adapter(typeJob)
 
             val dataList = adapter.fromJson(data)
-
             if (dataList != null) {
                 postJobViewModel.updateJobList(dataList)
             }
@@ -108,8 +107,7 @@ class MainActivity : AppCompatActivity() {
             val moshi: Moshi = Moshi.Builder()
                 .add(KotlinJsonAdapterFactory())
                 .build()
-            val adapter : JsonAdapter<List<participants>> = moshi.adapter(typeParticipations)
-
+            val adapter: JsonAdapter<List<participants>> = moshi.adapter(typeParticipations)
             val dataList = adapter.fromJson(data)
 
             if (dataList != null) {
@@ -125,4 +123,63 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, data, Toast.LENGTH_SHORT).show()
             })
         }
+
+    private val onDeleteJob =
+        Emitter.Listener { args ->
+            this.runOnUiThread {
+                val data = args[0] as String
+                val moshi: Moshi = Moshi.Builder()
+                    .add(KotlinJsonAdapterFactory())
+                    .build()
+                val adapter: JsonAdapter<List<job>> = moshi.adapter(typeJob)
+                val dataList = adapter.fromJson(data)
+                if (dataList != null) {
+                    postJobViewModel.deleteJob(dataList)
+                }
+            }
+        }
+
+    private val onUpdateJob =
+        Emitter.Listener { args ->
+            this.runOnUiThread {
+                val data = args[0] as String
+                val moshi: Moshi = Moshi.Builder()
+                    .add(KotlinJsonAdapterFactory())
+                    .build()
+                Log.i("Datasent", "HERE")
+                val adapter: JsonAdapter<List<job>> = moshi.adapter(typeJob)
+                val dataList = adapter.fromJson(data)
+                if (dataList != null) {
+                    postJobViewModel.updateJobList(dataList)
+                }
+            }
+        }
+
+    override fun onBackPressed() {
+        val fragment =
+            this.supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container)
+        (fragment as? IOnBackPressed)?.onBackPressed()?.let {
+            super.onBackPressed()
+        }
+    }
+
+    private val onDeleteParticipation = Emitter.Listener { args ->
+        this.runOnUiThread {
+            val data = args[0] as String
+            val moshi: Moshi = Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .build()
+            val adapter: JsonAdapter<List<participants>> = moshi.adapter(typeParticipations)
+            Log.i("DELETE", "DELETE")
+            val dataList = adapter.fromJson(data)
+
+            if (dataList != null) {
+                participationsViewModel.deleteParticipation(dataList)
+            }
+        }
+    }
+}
+
+interface IOnBackPressed {
+    fun onBackPressed()
 }

@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.csis4280.volunteerjobs.IOnBackPressed
 import com.csis4280.volunteerjobs.URL
 import com.csis4280.volunteerjobs.databinding.FragmentHomeBinding
 import com.csis4280.volunteerjobs.ui.database.job
@@ -27,7 +29,7 @@ import kotlinx.coroutines.Job
 import org.json.JSONObject
 import java.net.URISyntaxException
 
-class HomeFragment : Fragment(), ListAdapter.ListItemListener {
+class HomeFragment : Fragment(), ListAdapter.ListItemListener, IOnBackPressed {
     private lateinit var postJobViewModel: PostJobViewModel
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var adapter: ListAdapter
@@ -63,5 +65,9 @@ class HomeFragment : Fragment(), ListAdapter.ListItemListener {
         val action =
             HomeFragmentDirections.actionNavigationHomeToJobDetailsFragment(jobId, isSignedUp, postedBy)
         findNavController().navigate(action)
+    }
+
+    override fun onBackPressed() {
+        requireActivity().finish()
     }
 }

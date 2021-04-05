@@ -25,7 +25,10 @@ interface participantDao {
     @Query("SELECT * FROM job WHERE jobId = :id")
     fun getJobById(id: Int): job?
 
-    @Delete()
-    fun deleteEntry(note: participants)
+    @Delete
+    fun deleteParticipation(list: List<participants>)
+
+    @Delete
+    fun delete(list: participants)
 
 }

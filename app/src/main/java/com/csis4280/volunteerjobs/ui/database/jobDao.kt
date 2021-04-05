@@ -9,7 +9,7 @@ interface jobDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertJob(job:job)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllJob(jobs: List<job>)
 
     @Query("SELECT * FROM job ")
@@ -22,5 +22,11 @@ interface jobDao {
     fun getMAXJobId(email: String): Int?
 
     @Delete
-    fun deleteJob(note: job)
+    fun deleteJob(job: job)
+
+    @Delete
+    fun deleteJobList(job: List<job>)
+
+    @Query("DELETE FROM job")
+    fun deleteAll()
 }

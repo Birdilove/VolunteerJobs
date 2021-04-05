@@ -20,8 +20,15 @@ class ParticipationsViewModel(app: Application) : AndroidViewModel(app) {
     fun updateParticipantsList(participants: List<participants>) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                Log.i("ADDDATA", "HERE")
                 database?.paeticipantDao()?.insertAllParticipants(participants)
+            }
+        }
+    }
+
+    fun deleteParticipation(participants: List<participants>){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                database?.paeticipantDao()?.deleteParticipation(participants)
             }
         }
     }

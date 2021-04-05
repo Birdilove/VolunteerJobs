@@ -15,12 +15,14 @@ import androidx.annotation.Nullable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.csis4280.volunteerjobs.R
 import com.csis4280.volunteerjobs.URL
 import com.csis4280.volunteerjobs.databinding.FragmentPostJobBinding
 import com.csis4280.volunteerjobs.databinding.FragmentResetPasswordBinding
 import com.csis4280.volunteerjobs.ui.database.job
+import com.csis4280.volunteerjobs.ui.home.HomeFragmentDirections
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -61,6 +63,9 @@ class PostJobFragment : Fragment() {
             postJobViewModel.currentJob.value?.endDate = endDate.toString()
             postJobViewModel.currentJob.value?.postedBy = auth.currentUser?.email.toString()
             postJobViewModel.updateJob()
+            val action =
+                PostJobFragmentDirections.actionNavigationPostToNavigationHome()
+            findNavController().navigate(action)
         }
 
         binding.buttonStartDate.setOnClickListener {

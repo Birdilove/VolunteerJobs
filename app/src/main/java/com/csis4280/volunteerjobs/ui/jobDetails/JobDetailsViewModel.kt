@@ -46,7 +46,6 @@ class JobDetailsViewModel(app: Application) : AndroidViewModel(app) {
             withContext(Dispatchers.IO) {
                 currentJob.value?.let {
                     database?.jobDao()?.insertJob(it)
-
                     val jobId = it.jobId
                     val jobTitle = it.jobTitle
                     val jobType = it.jobType
@@ -113,7 +112,7 @@ class JobDetailsViewModel(app: Application) : AndroidViewModel(app) {
             it.userEmail = userEmail
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
-                    database?.paeticipantDao()?.deleteEntry(it)
+                    database?.paeticipantDao()?.delete(it)
                     val jobId = it.jobId
                     val postedBy = it.postedBy
                     val userEmail = it.userEmail
