@@ -16,14 +16,13 @@ class ListAdapterParticipated(
     private val listener: ListItemListener
 ) : RecyclerView.Adapter<ListAdapterParticipated.ViewHolder>() {
 
-
     inner class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
         val binding = ListLayoutBinding.bind(itemView)
     }
 
     interface ListItemListener {
-        fun editJob(noteId: Int, isSignedUp: Int)
+        fun editJob(noteId: Int, isSignedUp: Int, postedBy: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -47,7 +46,7 @@ class ListAdapterParticipated(
             }
 
             root.setOnClickListener {
-                listener.editJob(job.jobId, isSignedUp)
+                listener.editJob(job.jobId, isSignedUp, job.postedBy)
             }
         }
     }

@@ -15,8 +15,8 @@ interface jobDao {
     @Query("SELECT * FROM job ")
     fun getAll(): LiveData<List<job>>
 
-    @Query("SELECT * FROM job WHERE jobId = :id")
-    fun getJobById(id: Int): job?
+    @Query("SELECT * FROM job WHERE jobId = :id AND postedBy = :postedBy")
+    fun getJobById(id: Int, postedBy: String): job?
 
     @Query("SELECT MAX(jobId) FROM job WHERE postedBy = :email")
     fun getMAXJobId(email: String): Int?

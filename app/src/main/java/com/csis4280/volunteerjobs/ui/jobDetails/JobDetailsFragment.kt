@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.csis4280.volunteerjobs.databinding.FragmentJobDetailsBinding
+import com.csis4280.volunteerjobs.loggedInUser
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,7 +41,6 @@ class JobDetailsFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(JobDetailsViewModel::class.java)
 
         val newPattern = "EEE MMM dd HH:mm:ss Z yyyy"
-
         val formatter = SimpleDateFormat(newPattern, Locale.ENGLISH)
         val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy")
 
@@ -53,7 +53,6 @@ class JobDetailsFragment : Fragment() {
                     simpleDateFormat.format(formatter.parse(job.startDate))
                 binding.buttonUpdateEndDate.text =
                     simpleDateFormat.format(formatter.parse(job.endDate))
-
                 binding.description.setText(job.jobDescription)
                 if (job.postedBy == auth.currentUser?.email.toString()) {
                     Log.i("Focusable", "Focus")
@@ -73,12 +72,14 @@ class JobDetailsFragment : Fragment() {
                     binding.buttonDeleteJob.isClickable = false
                     binding.buttonUpdateJob.isClickable = false
                 }
+                startDate = formatter.parse(job.startDate)
+                endDate = formatter.parse(job.endDate)
             })
         })
 
-        viewModel.getJobById(args.jobId)
-        viewModel.getParticipantById(args.jobId, auth.currentUser?.email.toString())
-        viewModel.getUserByEmail(auth.currentUser?.email.toString())
+        viewModel.getJobById(args.jobId, args.postedBy)
+        viewModel.getParticipantById(args.jobId, loggedInUser)
+        viewModel.getUserByEmail(loggedInUser)
 
         var isSignedUp: Int = args.isSignedUp
         if (isSignedUp == 1) {
@@ -86,7 +87,11 @@ class JobDetailsFragment : Fragment() {
         }
         binding.buttonSignForJob.setOnClickListener {
             if (isSignedUp == 1) {
-                viewModel.signOutOfJob()
+                viewModel.signOutOfJob(
+                    viewModel.currentJob.value?.jobId!!,
+                    viewModel.currentJob.value?.postedBy.toString(),
+                    auth.currentUser?.email.toString()
+                )
                 binding.buttonSignForJob.text = "Sign Up"
                 isSignedUp = 0
             } else {
@@ -105,6 +110,7 @@ class JobDetailsFragment : Fragment() {
                 it.endDate = endDate.toString()
             })
             viewModel.updateJob()
+
             Toast.makeText(requireContext(), "Job post updated", Toast.LENGTH_SHORT).show()
         }
 
@@ -115,11 +121,11 @@ class JobDetailsFragment : Fragment() {
         }
 
         binding.buttonUpdateStartDate.setOnClickListener {
-            startDate = pickDateTime(binding.buttonUpdateStartDate)
+            startDate = pickDateTime(binding.buttonUpdateStartDate, 0)
         }
 
         binding.buttonUpdateEndDate.setOnClickListener {
-            endDate = pickDateTime(binding.buttonUpdateEndDate)
+            endDate = pickDateTime(binding.buttonUpdateEndDate, 1)
         }
 
         return binding.root
@@ -128,12 +134,12 @@ class JobDetailsFragment : Fragment() {
     private fun add() {
         viewModel.addToParticipation(
             viewModel.currentJob.value?.jobId!!,
-            viewModel.currentUser.value?.userId!!,
+            viewModel.currentJob.value?.postedBy.toString(),
             auth.currentUser?.email.toString()
         )
     }
 
-    private fun pickDateTime(@Nullable button: Button): Date {
+    private fun pickDateTime(button: Button, flag: Int): Date {
         val currentDateTime = Calendar.getInstance()
         val startYear = currentDateTime.get(Calendar.YEAR)
         val startMonth = currentDateTime.get(Calendar.MONTH)
@@ -143,6 +149,14 @@ class JobDetailsFragment : Fragment() {
             pickedDateTime.set(year, month, day)
             val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy")
             button.text = simpleDateFormat.format(pickedDateTime.time)
+            Log.i("DATE",
+                simpleDateFormat.parse(simpleDateFormat.format(pickedDateTime.time)).toString()
+            )
+            if(flag == 0){
+                startDate = pickedDateTime.time
+            }else{
+                endDate = pickedDateTime.time
+            }
         }, startYear, startMonth, startDay).show()
         return pickedDateTime.time
     }

@@ -36,11 +36,10 @@ class ParticipationsFragment : Fragment(), ListAdapter.ListItemListener {
                 participationsBinding.recyclerViewParticipations.layoutManager = LinearLayoutManager(activity)
             })
         })
-
         return participationsBinding.root
     }
 
-    override fun editJob(noteId: Int, isSignedUp: Int) {
+    override fun editJob(noteId: Int, isSignedUp: Int, postedBy: String) {
 
     }
 }

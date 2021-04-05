@@ -50,5 +50,8 @@
             android:name="isSignedUp"
             app:argType="integer"
             android:defaultValue="0" />
+        <argument
+            android:name="postedBy"
+            app:argType="string" />
     </fragment>
 </navigation>

@@ -62,7 +62,6 @@ class LoginFragment : Fragment() {
             )
                 .addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success")
                         viewModel.getUserById(auth.currentUser?.email.toString())
                         viewModel.addUser(auth.currentUser?.email.toString(),auth.currentUser?.email.toString())
@@ -73,7 +72,6 @@ class LoginFragment : Fragment() {
                         val intent = Intent(requireContext(), MainActivity::class.java)
                         startActivity(intent)
                     } else {
-                        // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithEmail:failure", task.exception)
                         Toast.makeText(
                             context, "Authentication failed.",

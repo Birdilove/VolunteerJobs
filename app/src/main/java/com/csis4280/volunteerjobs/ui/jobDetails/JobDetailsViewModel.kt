@@ -6,6 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.csis4280.volunteerjobs.loggedInUser
+import com.csis4280.volunteerjobs.mSocket
 import com.csis4280.volunteerjobs.ui.database.AppDatabase
 import com.csis4280.volunteerjobs.ui.database.job
 import com.csis4280.volunteerjobs.ui.database.participants
@@ -15,22 +17,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 class JobDetailsViewModel(app: Application) : AndroidViewModel(app) {
-
     private val database = AppDatabase.getInstance(app)
     val signedUpjobList = database?.paeticipantDao()
-        ?.getAllParticipations(FirebaseAuth.getInstance().currentUser?.email.toString())
+        ?.getAllParticipations(loggedInUser)
     val currentJob = MutableLiveData<job>()
     val currentUser = MutableLiveData<user>()
     val currentParticipant = MutableLiveData<participants>()
 
-    fun getJobById(jobId: Int) {
+    fun getJobById(jobId: Int, postedBy: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val job =
                     if (jobId != 0) {
-                        database?.jobDao()?.getJobById(jobId)
+                        database?.jobDao()?.getJobById(jobId, postedBy)
                     } else {
                         job()
                     }
@@ -42,7 +44,21 @@ class JobDetailsViewModel(app: Application) : AndroidViewModel(app) {
     fun updateJob() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                currentJob.value?.let { database?.jobDao()?.insertJob(it) }
+                currentJob.value?.let {
+                    database?.jobDao()?.insertJob(it)
+
+                    val jobId = it.jobId
+                    val jobTitle = it.jobTitle
+                    val jobType = it.jobType
+                    val jobDesc = it.jobDescription
+                    val jobStartDate = it.startDate
+                    val jobEndDate = it.endDate
+                    val postedBy = it.postedBy
+                    val jsonstring: String =
+                        "{'jobId': ${jobId}, 'jobTitle': '${jobTitle}', 'jobType': '${jobType}', 'jobDesc': '${jobDesc}', 'jobStartDate': '${jobStartDate}', 'jobEndDate': '${jobEndDate}', 'postedBy': '${postedBy}'}"
+                    val jobj = JSONObject(jsonstring)
+                    mSocket?.emit("updateJob", jobj)
+                }
             }
         }
     }
@@ -50,7 +66,14 @@ class JobDetailsViewModel(app: Application) : AndroidViewModel(app) {
     fun deleteJob() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                currentJob.value?.let { database?.jobDao()?.deleteJob(it) }
+                currentJob.value?.let { database?.jobDao()?.deleteJob(it)
+                    val jobId = it.jobId
+                    val postedBy = it.postedBy
+                    val jsonString: String =
+                        "{'jobId': ${jobId}, 'postedBy': '${postedBy}'}"
+                    val jobj = JSONObject(jsonString)
+                    mSocket?.emit("deleteJob", jobj)
+                }
             }
         }
     }
@@ -83,26 +106,42 @@ class JobDetailsViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun signOutOfJob() {
-        currentParticipant.value.let {
+    fun signOutOfJob(jobId: Int, postedBy: String, userEmail: String) {
+        currentParticipant.value?.let {
+            it.jobId = jobId
+            it.postedBy = postedBy
+            it.userEmail = userEmail
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
-                    if (it != null) {
-                        database?.paeticipantDao()?.deleteEntry(it)
-                    }
+                    database?.paeticipantDao()?.deleteEntry(it)
+                    val jobId = it.jobId
+                    val postedBy = it.postedBy
+                    val userEmail = it.userEmail
+                    val jsonString: String =
+                        "{'jobId': ${jobId}, 'postedBy': '${postedBy}', 'userEmail': '${userEmail}'}"
+                    val jobj = JSONObject(jsonString)
+                    mSocket?.emit("deleteParticipation", jobj)
                 }
             }
         }
     }
 
-    fun addToParticipation(jobId: Int, userId: Int, userEmail: String) {
+    fun addToParticipation(jobId: Int, postedBy: String, userEmail: String) {
         currentParticipant.value?.let {
             it.jobId = jobId
-            it.userId = userId
+            it.postedBy = postedBy
             it.userEmail = userEmail
+            Log.i("Participation Data" , "USER ID "+ it.jobId + " PostedBy "+ it.postedBy +" Email "+ it.userEmail+" Log "+ loggedInUser)
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     database?.paeticipantDao()?.insertParticipant(it)
+                    val jobId = it.jobId
+                    val postedBy = it.postedBy
+                    val userEmail = it.userEmail
+                    val jsonString: String =
+                        "{'jobId': ${jobId}, 'postedBy': '${postedBy}', 'userEmail': '${userEmail}'}"
+                    val jobj = JSONObject(jsonString)
+                    mSocket?.emit("addToParticipation", jobj)
                 }
             }
         }

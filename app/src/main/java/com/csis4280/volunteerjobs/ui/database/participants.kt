@@ -12,19 +12,13 @@ import kotlinx.android.parcel.Parcelize
         foreignKeys = [ForeignKey(
                 entity = job::class,
                 parentColumns = arrayOf("jobId", "postedBy"),
-                childColumns = arrayOf("jobId", "userEmail"),
+                childColumns = arrayOf("jobId", "postedBy"),
                 onDelete = ForeignKey.CASCADE
-        ), ForeignKey(
-                entity = user::class,
-                parentColumns = arrayOf("userId"),
-                childColumns = arrayOf("userId"),
-                onDelete = ForeignKey.CASCADE
-        )],primaryKeys = ["jobId", "userEmail"]
+        )],primaryKeys = ["jobId", "postedBy", "userEmail"]
 )
 data class participants(
-        var particiaptionId: Int,
         var jobId: Int,
-        var userId: Int,
+        var postedBy: String,
         var userEmail: String) : Parcelable {
-    constructor() : this(0,0, 0, "")
+    constructor() : this(0,"",  "")
 }

@@ -12,6 +12,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.csis4280.volunteerjobs.ui.database.job
+import com.csis4280.volunteerjobs.ui.database.participants
+import com.csis4280.volunteerjobs.ui.participations.ParticipationsViewModel
 import com.csis4280.volunteerjobs.ui.postJob.PostJobViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.moshi.JsonAdapter
@@ -27,13 +29,17 @@ import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.net.URISyntaxException
 
+var mSocket: Socket? = null
 var string: String = ""
-const val URL = "http://3.89.150.41:5000/"
+const val URL = "http://3.85.78.25:5000/"
+var loggedInUser = FirebaseAuth.getInstance().currentUser?.email.toString()
 class MainActivity : AppCompatActivity() {
-    var mSocket: Socket? = null
+
     private lateinit var auth: FirebaseAuth
-    private val myType = Types.newParameterizedType(List::class.java, job::class.java)
+    private val typeJob = Types.newParameterizedType(List::class.java, job::class.java)
+    private val typeParticipations = Types.newParameterizedType(List::class.java, participants::class.java)
     private lateinit var postJobViewModel: PostJobViewModel
+    private lateinit var participationsViewModel: ParticipationsViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -52,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         postJobViewModel = ViewModelProvider(this).get(PostJobViewModel::class.java)
+        participationsViewModel = ViewModelProvider(this).get(ParticipationsViewModel::class.java)
 
         try {
             mSocket = IO.socket(URL)
@@ -67,8 +74,10 @@ class MainActivity : AppCompatActivity() {
             Log.i("Connection ", string)
         }
         mSocket?.emit("getData")
+        mSocket?.emit("updateParticipants")
         mSocket?.on("notification", onNewMessage)
-        mSocket?.on("datasent", onDataRequest)
+        mSocket?.on("datasent", onDataUpdateJobList)
+        mSocket?.on("updateParticipants", onDataParticipantsUpdate)
     }
 
     override fun onDestroy() {
@@ -76,19 +85,35 @@ class MainActivity : AppCompatActivity() {
         mSocket?.disconnect()
     }
 
-    private val onDataRequest = Emitter.Listener { args ->
+    private val onDataUpdateJobList = Emitter.Listener { args ->
         this.runOnUiThread {
             val data = args[0] as String
 
             val moshi: Moshi = Moshi.Builder()
                 .add(KotlinJsonAdapterFactory())
                 .build()
-            val adapter : JsonAdapter<List<job>> = moshi.adapter(myType)
+            val adapter : JsonAdapter<List<job>> = moshi.adapter(typeJob)
 
             val dataList = adapter.fromJson(data)
 
             if (dataList != null) {
                 postJobViewModel.updateJobList(dataList)
+            }
+        }
+    }
+
+    private val onDataParticipantsUpdate = Emitter.Listener { args ->
+        this.runOnUiThread {
+            val data = args[0] as String
+            val moshi: Moshi = Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .build()
+            val adapter : JsonAdapter<List<participants>> = moshi.adapter(typeParticipations)
+
+            val dataList = adapter.fromJson(data)
+
+            if (dataList != null) {
+                participationsViewModel.updateParticipantsList(dataList)
             }
         }
     }

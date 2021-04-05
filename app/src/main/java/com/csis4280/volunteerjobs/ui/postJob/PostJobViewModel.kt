@@ -23,6 +23,7 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
     var string: String = ""
     var mSocket: Socket? = null
     var maxId: Int = 0
+
     fun updateJobList(jobList: List<job>) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -32,16 +33,16 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun getJobById(jobId: Int) {
+    fun getJobById(jobId: Int, postedBy: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val book =
+                val job =
                     if (jobId != 0) {
-                        database?.jobDao()?.getJobById(jobId)
+                        database?.jobDao()?.getJobById(jobId, postedBy)
                     } else {
                         job()
                     }
-                currentJob.postValue(book!!)  // use postValue because it is running in the background
+                currentJob.postValue(job!!)
             }
         }
     }
@@ -57,7 +58,6 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun updateJob() {
-        // would only be evaluated if currentNote is not null
         currentJob.value?.let {
             it.jobId = maxId + 1
             it.jobType = it.jobType.trim()
@@ -72,8 +72,6 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
                     if (it.jobTitle.isEmpty()) {
                         database?.jobDao()?.deleteJob(it)
                     } else {
-                        // if it exists, it will perform an update
-                        // see NoteDao for the implementation details
                         database?.jobDao()?.insertJob(it)
 
                         try {

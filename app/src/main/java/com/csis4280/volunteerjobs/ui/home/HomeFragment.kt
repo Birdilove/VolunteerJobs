@@ -33,7 +33,6 @@ class HomeFragment : Fragment(), ListAdapter.ListItemListener {
     private lateinit var adapter: ListAdapter
     private lateinit var binding: FragmentHomeBinding
     private lateinit var auth: FirebaseAuth
-    private val myType = Types.newParameterizedType(List::class.java, job::class.java)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,56 +46,22 @@ class HomeFragment : Fragment(), ListAdapter.ListItemListener {
 
         homeViewModel.jobList?.observe(viewLifecycleOwner, Observer { allJobsList ->
             homeViewModel.signedUpjobList?.observe(viewLifecycleOwner, {
+                Log.i("SelectedListSize ", homeViewModel.signedUpjobList?.value?.size.toString())
                 adapter = ListAdapter(allJobsList, it, this)
                 binding.recyclerView.adapter = adapter
                 binding.recyclerView.layoutManager = LinearLayoutManager(activity)
             })
         })
 
-        homeViewModel.getJobById(0)
+        homeViewModel.getJobById(0, auth.currentUser?.email.toString())
         homeViewModel.getUserByEmail(auth.currentUser?.email.toString())
 
         return binding.root
     }
 
-    override fun editJob(jobId: Int, isSignedUp: Int) {
+    override fun editJob(jobId: Int, isSignedUp: Int, postedBy: String) {
         val action =
-            HomeFragmentDirections.actionNavigationHomeToJobDetailsFragment(jobId, isSignedUp)
+            HomeFragmentDirections.actionNavigationHomeToJobDetailsFragment(jobId, isSignedUp, postedBy)
         findNavController().navigate(action)
     }
-
-    /*private val onNewMessage =
-        Emitter.Listener { args ->
-            requireActivity().runOnUiThread(Runnable {
-                val data = args[0] as String
-                Toast.makeText(requireContext(), data, Toast.LENGTH_SHORT).show()
-                *//*val username: String
-                val message: String
-                try {
-                    username = data.getString("username")
-                    message = data.getString("message")
-                } catch (e: JSONException) {
-                    return@Runnable
-                }*//*
-                // add the message to view
-                //addMessage(username, message);
-            })
-        }*/
-
-   /* private val onDataRequest = Emitter.Listener { args ->
-        requireActivity().runOnUiThread {
-            val data = args[0] as String
-
-            val moshi: Moshi = Moshi.Builder()
-                .add(KotlinJsonAdapterFactory())
-                .build()
-            val adapter : JsonAdapter<List<job>> = moshi.adapter(myType)
-
-            val dataList = adapter.fromJson(data)
-
-            if (dataList != null) {
-                postJobViewModel.updateJobList(dataList)
-            }
-        }
-    }*/
 }

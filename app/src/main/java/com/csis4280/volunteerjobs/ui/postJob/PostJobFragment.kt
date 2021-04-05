@@ -43,15 +43,11 @@ class PostJobFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var startDate: Date
     private lateinit var endDate: Date
-    private val myType = Types.newParameterizedType(List::class.java, job::class.java)
-    var string: String = ""
-    var mSocket: Socket? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         auth = FirebaseAuth.getInstance()
         binding = FragmentPostJobBinding.inflate(inflater, container, false)
         postJobViewModel = ViewModelProvider(this).get(PostJobViewModel::class.java)
@@ -79,7 +75,7 @@ class PostJobFragment : Fragment() {
             FirebaseAuth.getInstance().signOut();
         }
 
-        postJobViewModel.getJobById(args.jobid)
+        postJobViewModel.getJobById(args.jobid, auth.currentUser?.email.toString())
         postJobViewModel.getMaxId(auth.currentUser?.email.toString())
 
         return binding.root
@@ -95,9 +91,6 @@ class PostJobFragment : Fragment() {
             pickedDateTime.set(year, month, day)
             val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy")
             button.text = simpleDateFormat.format(pickedDateTime.time)
-            Log.i("DATE",
-                simpleDateFormat.parse(simpleDateFormat.format(pickedDateTime.time)).toString()
-            )
             if(flag == 0){
             startDate = pickedDateTime.time
             }else{

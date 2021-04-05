@@ -1,6 +1,7 @@
 package com.csis4280.volunteerjobs.ui.home
 
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,20 +10,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.csis4280.volunteerjobs.R
 import com.csis4280.volunteerjobs.databinding.ListLayoutBinding
 import com.csis4280.volunteerjobs.ui.database.job
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ListAdapter(
     private val jobList: List<job>,
     private val selectedJobList: List<job>,
     private val listener: ListItemListener
 ) : RecyclerView.Adapter<ListAdapter.ViewHolder>() {
-
+    val pattern = "EEE MMM dd HH:mm:ss Z yyyy"
+    val formatter = SimpleDateFormat(pattern, Locale.ENGLISH)
+    val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy", Locale.CANADA)
     inner class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
         val binding = ListLayoutBinding.bind(itemView)
     }
 
     interface ListItemListener {
-        fun editJob(noteId: Int, isSignedUp: Int)
+        fun editJob(noteId: Int, isSignedUp: Int, postedBy: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,7 +41,7 @@ class ListAdapter(
         with(holder.binding) {
             jobTitleText.text = job.jobTitle
             jobTypeText.text = job.jobType
-            startDate.text = "From: " + job.startDate.toString()
+            startDate.text = "From: " + simpleDateFormat.format(formatter.parse(job.endDate))
 
             var isSignedUp = 0
             if (selectedJobList.contains(job)) {
@@ -46,7 +51,7 @@ class ListAdapter(
             }
 
             root.setOnClickListener {
-                listener.editJob(job.jobId, isSignedUp)
+                listener.editJob(job.jobId, isSignedUp, job.postedBy)
             }
         }
     }
