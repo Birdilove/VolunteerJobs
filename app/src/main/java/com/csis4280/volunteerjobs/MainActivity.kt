@@ -3,15 +3,18 @@ package com.csis4280.volunteerjobs
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.csis4280.volunteerjobs.ui.database.job
 import com.csis4280.volunteerjobs.ui.database.participants
 import com.csis4280.volunteerjobs.ui.participations.ParticipationsViewModel
+import com.csis4280.volunteerjobs.ui.postJob.PostJobFragmentDirections
 import com.csis4280.volunteerjobs.ui.postJob.PostJobViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -48,12 +51,15 @@ class MainActivity : AppCompatActivity() {
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_post, R.id.navigation_participations
+                R.id.navigation_home,
+                R.id.navigation_post,
+                R.id.navigation_participations,
+                R.id.logOutFragment2
             )
         )
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
         postJobViewModel = ViewModelProvider(this).get(PostJobViewModel::class.java)
         participationsViewModel = ViewModelProvider(this).get(ParticipationsViewModel::class.java)
 
@@ -163,6 +169,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
 
 interface IOnBackPressed {
     fun onBackPressed()

@@ -2,8 +2,6 @@ package com.csis4280.volunteerjobs.ui.postJob
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -68,13 +66,11 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
 
                 return
             }
-
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     if (it.jobTitle.isEmpty()) {
                         database?.jobDao()?.deleteJob(it)
                     } else {
-                        database?.jobDao()?.insertJob(it)
 
                         try {
                             mSocket = IO.socket(URL)
@@ -90,6 +86,7 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
                             Log.i("Connection ", string)
                         }
 
+                        database?.jobDao()?.insertJob(it)
                         val jobId = it.jobId
                         val jobTitle = it.jobTitle
                         val jobType = it.jobType
@@ -97,8 +94,9 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
                         val jobStartDate = it.startDate
                         val jobEndDate = it.endDate
                         val postedBy = it.postedBy
+                        val noOfSlots = it.noOfSlots
                         val jsonstring: String =
-                            "{'jobId': ${jobId}, 'jobTitle': '${jobTitle}', 'jobType': '${jobType}', 'jobDesc': '${jobDesc}', 'jobStartDate': '${jobStartDate}', 'jobEndDate': '${jobEndDate}', 'postedBy': '${postedBy}'}"
+                            "{'jobId': ${jobId}, 'jobTitle': '${jobTitle}', 'jobType': '${jobType}', 'jobDesc': '${jobDesc}', 'jobStartDate': '${jobStartDate}', 'jobEndDate': '${jobEndDate}', 'postedBy': '${postedBy}', 'noOfSlots': ${noOfSlots}}"
                         val jobj = JSONObject(jsonstring)
                         mSocket?.emit("newJob", jobj)
                     }
@@ -107,17 +105,9 @@ class PostJobViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun deleteAll(){
+    fun deleteJob(job: List<job>) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                database?.jobDao()?.deleteAll()
-            }
-        }
-    }
-
-    fun deleteJob(job: List<job>){
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 database?.jobDao()?.deleteJobList(job)
             }
         }

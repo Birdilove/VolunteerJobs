@@ -33,6 +33,7 @@ class JobDetailsFragment : Fragment() {
     lateinit var auth: FirebaseAuth
     private lateinit var startDate: Date
     private lateinit var endDate: Date
+    var noOfSlotsLeft: Int = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -46,10 +47,13 @@ class JobDetailsFragment : Fragment() {
 
         val newPattern = "EEE MMM dd HH:mm:ss Z yyyy"
         val formatter = SimpleDateFormat(newPattern, Locale.ENGLISH)
-        val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy")
+        val simpleDateFormat = SimpleDateFormat("dd-MMM-yyyy")
 
         viewModel.currentJob.observe(viewLifecycleOwner, { job ->
             viewModel.signedUpjobList?.observe(viewLifecycleOwner, {
+                viewModel.noOfSlotsLeft.observe(viewLifecycleOwner, {
+
+                })
                 binding.textViewListedBy.text = "Listed by: " + job.postedBy
                 binding.title.setText(job.jobTitle)
                 binding.type.setText(job.jobType)
@@ -58,6 +62,14 @@ class JobDetailsFragment : Fragment() {
                 binding.buttonUpdateEndDate.text =
                     simpleDateFormat.format(formatter.parse(job.endDate))
                 binding.description.setText(job.jobDescription)
+                viewModel.getNoOfSlotsLeft(job.jobId, job.postedBy)
+                viewModel.noOfSlotsLeft.observe(viewLifecycleOwner,{
+                    binding.textViewCandidates.setText("Max slots: "+job.noOfSlots+" Slots left: "+(job.noOfSlots - viewModel.noOfSlotsLeft.value!!))
+                    if((viewModel.noOfSlotsLeft.value!! - job.noOfSlots) == 0){
+                        binding.buttonSignForJob.isClickable = false
+                        binding.buttonSignForJob.text = "Slots Full"
+                    }
+                })
                 if (job.postedBy == auth.currentUser?.email.toString()) {
                     Log.i("Focusable", "Focus")
                     binding.title.focusable = View.FOCUSABLE
@@ -80,6 +92,7 @@ class JobDetailsFragment : Fragment() {
                 endDate = formatter.parse(job.endDate)
             })
         })
+
 
         viewModel.getJobById(args.jobId, args.postedBy)
         viewModel.getParticipantById(args.jobId, loggedInUser)
@@ -115,7 +128,6 @@ class JobDetailsFragment : Fragment() {
                     it.endDate = endDate.toString()
                 })
                 viewModel.updateJob()
-
                 Toast.makeText(requireContext(), "Job post updated", Toast.LENGTH_SHORT).show()
             }
             else{
@@ -127,7 +139,6 @@ class JobDetailsFragment : Fragment() {
                     ).show()
                 }
             }
-
         }
 
 
@@ -151,13 +162,9 @@ class JobDetailsFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun checkDates(date: Date): Boolean {
         val currentDateTime = LocalDateTime.now()
-        if(currentDateTime.compareTo(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()))>0){
-            return true
-        }
-        else
-            return false
-
+        return currentDateTime > LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
     }
+
     private fun add() {
         viewModel.addToParticipation(
             viewModel.currentJob.value?.jobId!!,
@@ -177,35 +184,15 @@ class JobDetailsFragment : Fragment() {
             pickedDateTime.set(year, month, day)
             val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy")
             button.text = simpleDateFormat.format(pickedDateTime.time)
-            Log.i(
-                "DATE",
-                simpleDateFormat.parse(simpleDateFormat.format(pickedDateTime.time)).toString()
-            )
+
             if (flag == 0) {
                 startDate = pickedDateTime.time
             } else {
                 endDate = pickedDateTime.time
             }
         }, startYear, startMonth, startDay)
-        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000;
         datePickerDialog.show()
-
-
-
-       /* DatePickerDialog(requireContext(), { _, year, month, day ->
-            pickedDateTime.set(year, month, day)
-            val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy")
-            button.text = simpleDateFormat.format(pickedDateTime.time)
-            Log.i(
-                "DATE",
-                simpleDateFormat.parse(simpleDateFormat.format(pickedDateTime.time)).toString()
-            )
-            if (flag == 0) {
-                startDate = pickedDateTime.time
-            } else {
-                endDate = pickedDateTime.time
-            }
-        }, startYear, startMonth, startDay).show()*/
         return pickedDateTime.time
     }
 }

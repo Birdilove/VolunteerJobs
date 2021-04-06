@@ -23,7 +23,7 @@ class JobDetailsViewModel(app: Application) : AndroidViewModel(app) {
     val currentJob = MutableLiveData<job>()
     val currentUser = MutableLiveData<user>()
     val currentParticipant = MutableLiveData<participants>()
-
+    var noOfSlotsLeft = MutableLiveData<Int>()
     fun getJobById(jobId: Int, postedBy: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -143,6 +143,17 @@ class JobDetailsViewModel(app: Application) : AndroidViewModel(app) {
                         "{'jobId': ${jobId}, 'postedBy': '${postedBy}', 'userEmail': '${userEmail}'}"
                     val jobj = JSONObject(jsonString)
                     mSocket?.emit("addToParticipation", jobj)
+                }
+            }
+        }
+    }
+
+    fun getNoOfSlotsLeft(jobId: Int, postedBy: String){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                val slots = database?.paeticipantDao()?.getNoOfSlotsLeft(jobId, postedBy)
+                if(slots != null){
+                    noOfSlotsLeft.postValue(database?.paeticipantDao()?.getNoOfSlotsLeft(jobId, postedBy))
                 }
             }
         }

@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_navigation_home_to_jobDetailsFragment"
             app:destination="@id/jobDetailsFragment" />
+        <action
+            android:id="@+id/action_navigation_home_to_logOutFragment2"
+            app:destination="@id/logOutFragment2" />
     </fragment>
 
     <fragment
@@ -30,13 +33,20 @@
         <action
             android:id="@+id/action_navigation_post_to_navigation_home"
             app:destination="@id/navigation_home" />
+        <action
+            android:id="@+id/action_navigation_post_to_logOutFragment2"
+            app:destination="@id/logOutFragment2" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_participations"
         android:name="com.csis4280.volunteerjobs.ui.participations.ParticipationsFragment"
         android:label="@string/title_participation"
-        tools:layout="@layout/fragment_participations" />
+        tools:layout="@layout/fragment_participations" >
+        <action
+            android:id="@+id/action_navigation_participations_to_logOutFragment2"
+            app:destination="@id/logOutFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/jobDetailsFragment"
         android:name="com.csis4280.volunteerjobs.ui.jobDetails.JobDetailsFragment"
@@ -56,5 +66,26 @@
         <argument
             android:name="postedBy"
             app:argType="string" />
+        <action
+            android:id="@+id/action_jobDetailsFragment_to_logOutFragment2"
+            app:destination="@id/logOutFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/logOutFragment2"
+        android:name="com.csis4280.volunteerjobs.ui.home.LogOutFragment"
+        android:label="fragment_log_out"
+        tools:layout="@layout/fragment_log_out" >
+        <action
+            android:id="@+id/action_logOutFragment2_to_navigation_post"
+            app:destination="@id/navigation_post" />
+        <action
+            android:id="@+id/action_logOutFragment2_to_navigation_home"
+            app:destination="@id/navigation_home" />
+        <action
+            android:id="@+id/action_logOutFragment2_to_navigation_participations"
+            app:destination="@id/navigation_participations" />
+        <action
+            android:id="@+id/action_logOutFragment2_to_jobDetailsFragment"
+            app:destination="@id/jobDetailsFragment" />
     </fragment>
 </navigation>

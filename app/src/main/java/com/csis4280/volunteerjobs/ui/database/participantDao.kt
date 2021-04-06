@@ -22,6 +22,9 @@ interface participantDao {
     @Query("Select * from job join participants on job.jobId = participants.jobId AND job.postedBy = participants.postedBy where participants.userEmail = :email")
     fun getAllParticipations(email: String): LiveData<List<job>>
 
+    @Query("Select Count(*) from participants WHERE jobId = :jobId AND postedBy = :postedBy")
+    fun getNoOfSlotsLeft(jobId: Int, postedBy:String): Int
+
     @Query("SELECT * FROM job WHERE jobId = :id")
     fun getJobById(id: Int): job?
 

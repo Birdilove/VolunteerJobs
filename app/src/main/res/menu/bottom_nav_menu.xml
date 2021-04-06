@@ -8,12 +8,17 @@
 
     <item
         android:id="@+id/navigation_post"
-        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:icon="@drawable/ic_baseline_post_add_24"
         android:title="@string/title_post" />
 
     <item
         android:id="@+id/navigation_participations"
-        android:icon="@drawable/ic_notifications_black_24dp"
+        android:icon="@drawable/ic_baseline_person_pin_24"
         android:title="@string/title_participation" />
+
+    <item
+        android:id="@+id/logOutFragment2"
+        android:icon="@drawable/ic_baseline_exit_to_app_24"
+        android:title="Logout" />
 
 </menu>
