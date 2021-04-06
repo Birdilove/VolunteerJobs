@@ -20,7 +20,7 @@ class ListAdapter(
 ) : RecyclerView.Adapter<ListAdapter.ViewHolder>() {
     val pattern = "EEE MMM dd HH:mm:ss Z yyyy"
     val formatter = SimpleDateFormat(pattern, Locale.ENGLISH)
-    val simpleDateFormat = SimpleDateFormat("ddd-MMM-yyyy", Locale.CANADA)
+    val simpleDateFormat = SimpleDateFormat("dd-MMM-yyyy", Locale.CANADA)
     inner class ViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
         val binding = ListLayoutBinding.bind(itemView)
